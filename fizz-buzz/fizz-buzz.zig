@@ -6,18 +6,14 @@ pub fn main() !void {
     const stdout = &stdout_writer.interface;
     var count: u8 = 1;
     while (count < 70) : (count += 1) {
-        if (count % 3 == 0 and count % 5 == 0) {
-            try stdout.writeAll("Fizz Buzz\n");
-        } else if (count % 3 == 0) {
-            try stdout.writeAll("Fizz\n");
-        } else if (count % 5 == 0) {
-            try stdout.writeAll("Buzz\n");
-        } else try stdout.print("{}\n", .{count});
+        const div_3 = @intFromBool(count % 3 == 0);
+        const div_5 = @intFromBool(count % 5 == 0);
+        switch (@as(u2, div_3) << 1 | div_5) {
+            0b00 => try stdout.print("{}\n", .{count}),
+            0b10 => try stdout.writeAll("Fizz\n"),
+            0b01 => try stdout.writeAll("Buzz\n"),
+            0b11 => try stdout.writeAll("Fizz Buzz\n"),
+        }
     }
     try stdout.flush();
-}
-
-test "trivials" {
-    const expectEq = std.testing.expectEqual;
-    try expectEq(1, 1);
 }
